@@ -1,0 +1,25 @@
+{
+  "name": "veilicsdutybot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/laputacr0sx/veilicsDutyBot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/laputacr0sx/veilicsDutyBot/issues"
+  },
+  "homepage": "https://github.com/laputacr0sx/veilicsDutyBot#readme",
+  "dependencies": {
+    "axios": "^0.24.0",
+    "dotenv": "^10.0.0",
+    "telegraf": "^4.4.2"
+  }
+}
