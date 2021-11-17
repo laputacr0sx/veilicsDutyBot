@@ -1,9 +1,10 @@
+require('dotenv').config();
 const { Telegraf } = require('telegraf');
 const axios = require('axios');
-const bot = new Telegraf('1816582569:AAENdvfROXjnNdYNObuFkL7azXSImc1_I5A');
-const dutyFile =
-  'https://raw.githubusercontent.com/laputacr0sx/working-roster/master/mtr_duty.json';
-var dutyList = [];
+const bot = new Telegraf(process.env.TOKEN);
+const dutyFile = process.env.DUTYFILE;
+var button = {};
+var keyboard = [[]];
 
 bot.command('start', ctx => {
   bot.telegram.sendMessage(ctx.chat.id, 'hello World:)');
@@ -11,18 +12,17 @@ bot.command('start', ctx => {
 
 bot.command('duty', ctx => {
   axios.get(dutyFile).then(response => {
-    dutyList = Object.keys(response.data.duty);
+    Object.keys(response.data.duty).forEach(x => {
+      button.text = x;
+      button.callback_data = x;
+      keyboard.push([button]);
+      console.log(keyboard);
+    });
   });
-  console.log(
-    dutyList.forEach(x => {
-      text = x;
-      callback_data = x;
-    })
-  );
 
   bot.telegram.sendMessage(ctx.chat.id, 'Please choose duty from below:', {
     reply_markup: {
-      inline_keyboard: [[{ text: 'one', callback_data: 'one' }]],
+      inline_keyboard: [[]],
     },
   });
 });
