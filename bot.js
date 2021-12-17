@@ -5,7 +5,11 @@ const bot = new Telegraf(process.env.TOKEN);
 const dutyFile = process.env.DUTYFILE;
 
 bot.command('start', ctx => {
-  bot.telegram.sendMessage(ctx.chat.id, 'hello World:)');
+  bot.telegram.sendMessage(ctx.chat.id, 'hello World:)', {
+    reply_markup: {
+      remove_keyboard: true,
+    },
+  });
 });
 
 bot.command('duty', ctx => {
@@ -24,17 +28,18 @@ bot.command('duty', ctx => {
 
     ctx.telegram.sendMessage(ctx.chat.id, 'Please choose duty from below:', {
       reply_markup: {
-        inline_keyboard: kb,
+        keyboard: kb,
+        resize_keyboard: true,
+        one_time_keyboard: true,
       },
     });
   });
 });
 
-bot.action('G15', ctx => {
-  let chosen = ctx.update.callback_query.data;
-  ctx.answerCbQuery('This is the G15 duty');
-  // ctx.telegram.sendChatAction('typing');
-  ctx.reply(`You have pressed ${chosen}`);
-});
+// bot.action('G15', ctx => {
+//   let chosen = ctx.update.callback_query.data;
+//   ctx.answerCbQuery('This is the G15 duty');
+//   ctx.reply(`You have pressed ${chosen}`);
+// });
 
 bot.launch();
