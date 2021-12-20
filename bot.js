@@ -46,9 +46,25 @@ bot.command('duty', ctx => {
 });
 
 bot.hears(/^[135][0-5][0-9]/, ctx => {
-  console.log(ctx.match[0]);
-  bot.on(ctx.match[0], ctx => {
-    console.log(ctx);
+  bot.telegram.sendChatAction(ctx.chat.id, 'typing');
+  let kb = [];
+  axios.get(dutyFile).then(response => {
+    Object.keys(response.data.duty).forEach(x => {
+      let row = [];
+      let button = {};
+      button.text = x;
+      button.callback_data = x;
+      row.push(button);
+      kb.push(row);
+    });
+  });
+
+  bot.telegram.sendMessage(ctx.chat.id, `searching duty ${ctx.match[0]}`, {
+    reply_markup: {
+      keyboard: kb,
+      resize_keyboard: true,
+      one_time_keyboard: true,
+    },
   });
 });
 
@@ -65,12 +81,12 @@ bot.hears(/^8\d{5}[A-Z]?/, ctx => {
       bot.telegram.sendMessage(
         ctx.chat.id,
         `您查詢的${ctx.match[0]}更份資料如下
-        開工地點：${dutyRequired.bookOnLocation}
-        開工時間：${dutyRequired.bookOnTime}
-        收工時間：${dutyRequired.bookOffTime}
-        收工地點：${dutyRequired.bookOffLocation}
-        工時：${dutyRequired.duration}
-        備註：${dutyRequired.remarks}`
+        開工地點:${dutyRequired.bookOnLocation}
+        開工時間:${dutyRequired.bookOnTime}
+        收工時間:${dutyRequired.bookOffTime}
+        收工地點:${dutyRequired.bookOffLocation}
+        工時:${dutyRequired.duration}
+        備註:${dutyRequired.remarks}`
       );
     }
   });
