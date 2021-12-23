@@ -19,7 +19,6 @@ bot.command('start', ctx => {
 });
 
 function sendDuty(chatId, dutyName, dutyDetail) {
-  console.log(dutyDetail);
   if (!dutyDetail) {
     bot.telegram.sendChatAction(chatId, 'typing');
 
@@ -70,12 +69,12 @@ bot.hears(/^[135][0-5][0-9]/, ctx => {
         },
       }
     );
-  });
-  bot.hears(/[a-z]\d{2}/i, ctx => {
-    let dutyRequired = duty[ctx.match[0]][ctx.match[0].concat(dutyNumber)];
+    bot.hears(/[a-z]\d{2}/i, ctx => {
+      let dutyRequired = duty[ctx.match[0]][ctx.match[0] + dutyNumber];
 
-    ctx.deleteMessage();
-    sendDuty(ctx.chat.id, [ctx.match[0].concat(dutyNumber)], dutyRequired);
+      ctx.deleteMessage();
+      sendDuty(ctx.chat.id, ctx.match[0] + dutyNumber, dutyRequired);
+    });
   });
 });
 
