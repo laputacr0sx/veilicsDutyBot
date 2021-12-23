@@ -3,6 +3,7 @@ const { Telegraf } = require('telegraf');
 const axios = require('axios');
 const bot = new Telegraf(process.env.TOKEN);
 const dutyFile = process.env.DUTYFILE;
+var dutyNumber;
 
 bot.command('start', ctx => {
   bot.telegram.sendChatAction(ctx.chat.id, 'typing');
@@ -21,7 +22,6 @@ bot.command('start', ctx => {
 function sendDuty(chatId, dutyName, dutyDetail) {
   if (!dutyDetail) {
     bot.telegram.sendChatAction(chatId, 'typing');
-
     bot.telegram.sendMessage(
       chatId,
       `未能找到您輸入的 ${dutyName} 更份或輸入錯誤，請重新搜尋`
@@ -38,11 +38,12 @@ function sendDuty(chatId, dutyName, dutyDetail) {
 備註: ${dutyDetail.remarks}`
     );
   }
+  dutyNumber = '';
 }
 
 bot.hears(/^[135][0-5][0-9]/, ctx => {
   let kb = [];
-  let dutyNumber = ctx.match[0];
+  dutyNumber = ctx.match[0];
   let duty;
   bot.telegram.sendChatAction(ctx.chat.id, 'typing');
   axios.get(dutyFile).then(response => {
@@ -88,32 +89,6 @@ bot.hears(/^[89]\d{5}[A-Z]?/, ctx => {
 
     ctx.deleteMessage();
 
-    //     if (!dutyRequired) {
-    //       bot.telegram.sendChatAction(ctx.chat.id, 'typing');
-    //       ctx.deleteMessage();
-    //       bot.telegram.sendMessage(
-    //         ctx.chat.id,
-    //         `Sorry I cannot find your duty ${ctx.match[0]}`
-    //       );
-    //     } else {
-    //       ctx.deleteMessage();
-    //       bot.telegram.sendMessage(
-    //         ctx.chat.id,
-    //         `您查詢的${ctx.match[0]}更份資料如下
-    // 開工地點:${dutyRequired.bookOnLocation}
-    // 開工時間: ${dutyRequired.bookOnTime}
-    // 收工時間: ${dutyRequired.bookOffTime}
-    // 收工地點: ${dutyRequired.bookOffLocation}
-    // 工時: ${dutyRequired.duration}
-    // 備註: ${dutyRequired.remarks}`,
-    //         {
-    //           reply_markup: {
-    //             inline_keyboard: [[{ text: 'Return', callback_data: 'return' }]],
-    //           },
-    //           resize_keyboard: true,
-    //         }
-    //       );
-    //     }
     sendDuty(ctx.chat.id, ctx.match[0], dutyRequired);
   });
 });
