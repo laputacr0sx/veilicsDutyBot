@@ -1,7 +1,9 @@
 require('dotenv').config();
 const { Telegraf } = require('telegraf');
 const axios = require('axios');
-const bot = new Telegraf(process.env.TOKEN);
+const express = require('express');
+const bot = new Telegraf(process.env.BOT_TOKEN || '');
+const PORT = process.env.PORT || 3333;
 const dutyFile = process.env.DUTYFILE;
 var dutyNumber;
 
@@ -99,3 +101,6 @@ bot.hears(/^[89]\d{5}[A-Z]?/, ctx => {
 });
 
 bot.launch();
+
+process.once('SIGINT', () => bot.stop('SIGINT'));
+process.once('SIGTERM', () => bot.stop('SIGTERM'));
