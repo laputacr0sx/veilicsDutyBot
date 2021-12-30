@@ -1,11 +1,15 @@
 require('dotenv').config();
 const { Telegraf } = require('telegraf');
 const axios = require('axios');
-const express = require('express');
-const bot = new Telegraf(process.env.BOT_TOKEN || '');
+const API_TOKEN = process.env.BOT_TOKEN;
+const bot = new Telegraf(API_TOKEN || '');
 const PORT = process.env.PORT || 3333;
 const dutyFile = process.env.DUTYFILE;
+const URL = process.env.URL;
 var dutyNumber;
+
+bot.telegram.setWebhook(`${URL}/bot${API_TOKEN}`);
+bot.startWebhook(`/bot${API_TOKEN}`, null, PORT);
 
 bot.command('start', ctx => {
   bot.telegram.sendChatAction(ctx.chat.id, 'typing');
