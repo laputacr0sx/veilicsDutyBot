@@ -41,7 +41,7 @@ function sendDuty(chatId, dutyName, dutyDetail) {
   dutyNumber = '';
 }
 
-bot.hears(/^[135][0-5][0-9]/, ctx => {
+bot.hears(/^([a-z]\d{2})?([135][0-5][0-9])/i, ctx => {
   let kb = [];
   dutyNumber = ctx.match[0];
   let duty;
@@ -58,24 +58,29 @@ bot.hears(/^[135][0-5][0-9]/, ctx => {
         kb.push(row);
       }
     });
-    ctx.deleteMessage();
-    bot.telegram.sendMessage(
-      ctx.chat.id,
-      `請問是哪個更表的 ${dutyNumber} 更呢`,
-      {
-        reply_markup: {
-          keyboard: kb,
-          one_time_keyboard: true,
-          resize_keyboard: true,
-        },
-      }
-    );
-    bot.hears(/[a-z]\d{2}/i, ctx => {
-      let dutyRequired = duty[ctx.match[0]][ctx.match[0] + dutyNumber];
-
+    if (Object.keys(duty).includes(ctx.match[1])) {
       ctx.deleteMessage();
-      sendDuty(ctx.chat.id, ctx.match[0] + dutyNumber, dutyRequired);
-    });
+      sendDuty(ctx.chat.id, ctx.match[0], duty[ctx.match[1]][ctx.match[0]]);
+    } else {
+      ctx.deleteMessage();
+      bot.telegram.sendMessage(
+        ctx.chat.id,
+        `請問是哪個更表的 ${dutyNumber} 更呢`,
+        {
+          reply_markup: {
+            keyboard: kb,
+            one_time_keyboard: true,
+            resize_keyboard: true,
+          },
+        }
+      );
+      bot.hears(/[a-z]\d{2}/i, ctx => {
+        let dutyRequired = duty[ctx.match[0]][ctx.match[0] + dutyNumber];
+
+        ctx.deleteMessage();
+        sendDuty(ctx.chat.id, ctx.match[0] + dutyNumber, dutyRequired);
+      });
+    }
   });
 });
 
