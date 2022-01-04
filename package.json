@@ -17,6 +17,10 @@
   "bugs": {
     "url": "https://github.com/laputacr0sx/veilicsDutyBot/issues"
   },
+  "engines": {
+    "node": "17.0",
+    "npm": "8.0"
+  },
   "homepage": "https://github.com/laputacr0sx/veilicsDutyBot#readme",
   "dependencies": {
     "axios": "^0.24.0",
