@@ -8,14 +8,16 @@ const dutyFile = process.env.DUTYFILE;
 const URL = process.env.URL;
 var dutyNumber;
 
-bot.telegram.setWebhook(`${URL}/bot${API_TOKEN}`);
-bot.startWebhook(`/bot${API_TOKEN}`, null, PORT);
+// bot.telegram.setWebhook(`${URL}/bot${API_TOKEN}`);
+// bot.startWebhook(`/bot${API_TOKEN}`, null, PORT);
 
 bot.command('start', ctx => {
   bot.telegram.sendChatAction(ctx.chat.id, 'typing');
+  console.log();
   bot.telegram.sendMessage(
     ctx.chat.id,
-    `請輸入想查詢之更份
+    `歡迎 ${ctx.message.from.first_name} ${ctx.message.from.last_name}
+請輸入想查詢之更份
 如 129 / 525 / 881103A / 992701A 等`,
     {
       reply_markup: {
@@ -90,12 +92,12 @@ bot.hears(/^([a-z]\d{2})?([135][0-5][0-9])/i, ctx => {
   });
 });
 
-bot.hears(/^[89]\d{5}[A-Z]?/, ctx => {
+bot.hears(/^[89]\d{5}[A-Z]?/, async ctx => {
   bot.telegram.sendChatAction(ctx.chat.id, 'typing');
   const whichSpecialDuty = ctx.match[0].match(/^8.*/g) ? 'Training' : 'Special';
   bot.telegram.sendMessage(ctx.chat.id, `在${whichSpecialDuty}更份中搜尋 ...`);
 
-  axios.get(dutyFile).then(response => {
+  await axios.get(dutyFile).then(response => {
     const dutyRequired = response.data.duty[whichSpecialDuty][ctx.match[0]];
 
     ctx.deleteMessage();
