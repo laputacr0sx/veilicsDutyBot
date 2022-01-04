@@ -4,7 +4,6 @@
   "description": "A telegram bot to check details of certain duty",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
     "start": "node index.js"
   },
   "repository": {
