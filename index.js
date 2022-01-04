@@ -3,9 +3,9 @@ const { Telegraf } = require('telegraf');
 const axios = require('axios');
 const API_TOKEN = process.env.BOT_TOKEN;
 const bot = new Telegraf(API_TOKEN || '');
-const PORT = process.env.PORT || 3333;
+// const PORT = process.env.PORT || 3333;
 const dutyFile = process.env.DUTYFILE;
-const URL = process.env.URL;
+// const URL = process.env.URL;
 var dutyNumber;
 
 // bot.telegram.setWebhook(`${URL}/bot${API_TOKEN}`);
