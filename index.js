@@ -1,19 +1,18 @@
 require('dotenv').config();
 const { Telegraf } = require('telegraf');
 const axios = require('axios');
-const API_TOKEN = process.env.BOT_TOKEN;
-const bot = new Telegraf(API_TOKEN || '');
-// const PORT = process.env.PORT || 3333;
-const dutyFile = process.env.DUTYFILE;
-// const URL = process.env.URL;
-var dutyNumber;
 
-// bot.telegram.setWebhook(`${URL}/bot${API_TOKEN}`);
-// bot.startWebhook(`/bot${API_TOKEN}`, null, PORT);
+const API_TOKEN =
+  process.env.NODE_ENV === 'production'
+    ? process.env.BOT_TOKEN
+    : process.env.TEST_BOT_TOKEN;
+
+const bot = new Telegraf(API_TOKEN);
+const dutyFile = process.env.DUTYFILE;
+// var dutyNumber;
 
 bot.command('start', ctx => {
   bot.telegram.sendChatAction(ctx.chat.id, 'typing');
-  console.log();
   bot.telegram.sendMessage(
     ctx.chat.id,
     `歡迎 ${ctx.message.from.first_name} ${ctx.message.from.last_name}
@@ -43,25 +42,30 @@ function sendDuty(chatId, dutyName, dutyDetail) {
 收工時間: ${dutyDetail.bookOffTime}
 收工地點: ${dutyDetail.bookOffLocation}
 工時: ${dutyDetail.duration}
-備註: ${dutyDetail.remarks}`
+備註: ${dutyDetail.remarks}`,
+      {
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: `複製 ${dutyName} 資料`, callback_data: 'copy' }],
+          ],
+        },
+      }
     );
   }
-  dutyNumber = '';
 }
 
-bot.hears(/^([a-z]\d{2})?([135][0-5][0-9])/i, ctx => {
+bot.hears(/^([a-z]\d{2})?([135][0-5][0-9])/i, async ctx => {
   let kb = [];
   dutyNumber = ctx.match[0];
   let duty;
   bot.telegram.sendChatAction(ctx.chat.id, 'typing');
-  axios.get(dutyFile).then(response => {
+  await axios.get(dutyFile).then(response => {
     duty = response.data.duty;
     Object.keys(duty).forEach(x => {
       let row = [];
       let button = {};
       if (x.match(/[a-z]\d{2}/gi)) {
         button.text = x;
-        button.callback_data = x;
         row.push(button);
         kb.push(row);
       }
@@ -86,7 +90,9 @@ bot.hears(/^([a-z]\d{2})?([135][0-5][0-9])/i, ctx => {
         let dutyRequired = duty[ctx.match[0]][ctx.match[0] + dutyNumber];
 
         ctx.deleteMessage();
+        bot.telegram.sendChatAction(ctx.chat.id, 'typing');
         sendDuty(ctx.chat.id, ctx.match[0] + dutyNumber, dutyRequired);
+        dutyNumber = '';
       });
     }
   });
@@ -104,6 +110,11 @@ bot.hears(/^[89]\d{5}[A-Z]?/, async ctx => {
 
     sendDuty(ctx.chat.id, ctx.match[0], dutyRequired);
   });
+});
+
+bot.action('copy', ctx => {
+  ctx.answerCbQuery((text = '個掣未有用架喂'));
+  ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [[]] } });
 });
 
 bot.launch();
