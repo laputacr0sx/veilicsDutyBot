@@ -1,6 +1,7 @@
 require('dotenv').config();
 const { Telegraf } = require('telegraf');
 const axios = require('axios');
+const moment = require('moment');
 
 const API_TOKEN =
   process.env.NODE_ENV === 'production'
@@ -9,7 +10,6 @@ const API_TOKEN =
 
 const bot = new Telegraf(API_TOKEN);
 const dutyFile = process.env.DUTYFILE;
-// var dutyNumber;
 
 bot.command('start', ctx => {
   bot.telegram.sendChatAction(ctx.chat.id, 'typing');
@@ -36,20 +36,26 @@ function sendDuty(chatId, dutyName, dutyDetail) {
   } else {
     bot.telegram.sendMessage(
       chatId,
-      `您查詢的${dutyName}更份資料如下
+      `您查詢的 ${dutyName} 更份資料如下
 開工地點: ${dutyDetail.bookOnLocation}
 開工時間: ${dutyDetail.bookOnTime}
 收工時間: ${dutyDetail.bookOffTime}
 收工地點: ${dutyDetail.bookOffLocation}
 工時: ${dutyDetail.duration}
-備註: ${dutyDetail.remarks}`,
-      {
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: `複製 ${dutyName} 資料`, callback_data: 'copy' }],
-          ],
-        },
-      }
+備註: ${dutyDetail.remarks}
+
+*點取以下字串以複製內容*
+
+\`${dutyName} [${dutyDetail.bookOnLocation}]${moment(
+        dutyDetail.bookOnTime,
+        'hh:mm a'
+      ).format('HH:mm')} - ${moment(dutyDetail.bookOffTime, 'HH:mm a').format(
+        'HH:mm'
+      )}[${dutyDetail.bookOffLocation}] ${moment(
+        dutyDetail.duration,
+        'hh:mm'
+      ).format('h:mm')} ${dutyDetail.remarks}\``,
+      { parse_mode: 'MarkdownV2' }
     );
   }
 }
