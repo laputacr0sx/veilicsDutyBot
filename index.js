@@ -44,10 +44,10 @@ function sendDuty(chatId, dutyName, dutyDetail) {
       `您查詢的 ${dutyName} 更份資料如下
 
 開工地點: ${info.location[dutyDetail.bookOnLocation]}
-開工時間: ${dutyDetail.bookOnTime}
-收工時間: ${dutyDetail.bookOffTime}
+開工時間: ${moment(dutyDetail.bookOnTime, 'hh:mm a').format('HH:mm')}
+收工時間: ${moment(dutyDetail.bookOffTime, 'hh:mm a').format('HH:mm')}
 收工地點: ${info.location[dutyDetail.bookOffLocation]}
-工時: ${dutyDetail.duration}
+工時: ${moment(dutyDetail.duration, 'hh:mm').format('h:mm')}
 備註: ${dutyDetail.remarks}
 
 *點取以下文字以複製內容*
@@ -134,4 +134,4 @@ bot.hears(/^[89]\d{5}[A-Z]?/i, async ctx => {
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
 
-bot.launch();
+bot.launch({});
