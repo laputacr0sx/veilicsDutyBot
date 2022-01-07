@@ -1,0 +1,19 @@
+{
+  "location": {
+    "HUH": "紅磡",
+    "MKK": "旺角東",
+    "SHT": "沙田",
+    "FOT": "火炭",
+    "HTD": "何東樓",
+    "TAP": "大埔墟",
+    "SHS": "上水",
+    "LOW": "羅湖"
+  },
+  "miscellenous": {
+    "Special": "特殊/通宵",
+    "Training": "訓練相關"
+  },
+  "remarksContent": {
+    "PU": "升弓"
+  }
+}

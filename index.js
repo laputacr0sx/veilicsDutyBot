@@ -9,6 +9,7 @@ const API_TOKEN =
     : process.env.TEST_BOT_TOKEN; //local dev token
 
 const bot = new Telegraf(API_TOKEN);
+const info = require('./src/info.json');
 
 bot.command('start', ctx => {
   bot.telegram.sendChatAction(ctx.chat.id, 'typing');
@@ -17,7 +18,10 @@ bot.command('start', ctx => {
     `歡迎 *${ctx.message.from.first_name}* 
 
 請輸入想查詢之更份
-如 129 / 525 / 881103 / 992701H 等`,
+如 129 / 525 / 881103 / 992701H 等
+
+如遇問題請重新使用 \`/start\` 指令
+`,
     {
       parse_mode: 'MarkdownV2',
       reply_markup: {
@@ -39,10 +43,10 @@ function sendDuty(chatId, dutyName, dutyDetail) {
       chatId,
       `您查詢的 ${dutyName} 更份資料如下
 
-開工地點: ${dutyDetail.bookOnLocation}
+開工地點: ${info.location[dutyDetail.bookOnLocation]}
 開工時間: ${dutyDetail.bookOnTime}
 收工時間: ${dutyDetail.bookOffTime}
-收工地點: ${dutyDetail.bookOffLocation}
+收工地點: ${info.location[dutyDetail.bookOffLocation]}
 工時: ${dutyDetail.duration}
 備註: ${dutyDetail.remarks}
 
@@ -114,7 +118,10 @@ bot.hears(/^([a-z]\d{2})?([135][0-5][0-9])$/i, async ctx => {
 bot.hears(/^[89]\d{5}[A-Z]?/i, async ctx => {
   bot.telegram.sendChatAction(ctx.chat.id, 'typing');
   const whichSpecialDuty = ctx.match[0].match(/^8.*/g) ? 'Training' : 'Special';
-  bot.telegram.sendMessage(ctx.chat.id, `在${whichSpecialDuty}更份中搜尋 ...`);
+  bot.telegram.sendMessage(
+    ctx.chat.id,
+    `在${info.miscellenous[whichSpecialDuty]}更份中搜尋 ...`
+  );
 
   await axios.get(process.env.DUTYFILE).then(response => {
     const dutyRequired =
