@@ -2,6 +2,7 @@ require('dotenv').config();
 const { Telegraf } = require('telegraf');
 const axios = require('axios');
 const moment = require('moment');
+const info = require('./src/info.json');
 
 const API_TOKEN =
   process.env.NODE_ENV === 'production'
@@ -9,7 +10,6 @@ const API_TOKEN =
     : process.env.TEST_BOT_TOKEN; //local dev token
 
 const bot = new Telegraf(API_TOKEN);
-const info = require('./src/info.json');
 
 bot.command('start', ctx => {
   bot.telegram.sendChatAction(ctx.chat.id, 'typing');
@@ -61,7 +61,12 @@ function sendDuty(chatId, dutyName, dutyDetail) {
         dutyDetail.duration,
         'hh:mm'
       ).format('h:mm')} <${dutyDetail.remarks}>\n\``,
-      { parse_mode: 'MarkdownV2' }
+      {
+        parse_mode: 'MarkdownV2',
+        reply_markup: {
+          remove_keyboard: true,
+        },
+      }
     );
   }
 }
@@ -83,12 +88,14 @@ bot.hears(/^([a-z]\d{2})?([135][0-5][0-9])$/i, async ctx => {
         // kb.push(row);
       }
     });
-    if (Object.keys(duty).includes(ctx.match[1])) {
+    if (ctx.match[1]) {
+      Object.keys(duty).includes(ctx.match[1].toUpperCase());
       ctx.deleteMessage();
       sendDuty(
         ctx.chat.id,
         ctx.match[0].toUpperCase(),
-        duty[ctx.match[1].toUpperCase()][ctx.match[0].toUpperCase()]
+        duty[ctx.match[1].toUpperCase()][dutyNumber]
+        // duty[ctx.match[1].toUpperCase()][ctx.match[0].toUpperCase()]
       );
     } else {
       ctx.deleteMessage();
@@ -105,7 +112,7 @@ bot.hears(/^([a-z]\d{2})?([135][0-5][0-9])$/i, async ctx => {
       );
       bot.hears(/[a-z]\d{2}/i, ctx => {
         let dutyRequired = duty[ctx.match[0]][ctx.match[0] + dutyNumber];
-
+        console.log(dutyRequired);
         ctx.deleteMessage();
         bot.telegram.sendChatAction(ctx.chat.id, 'typing');
         sendDuty(ctx.chat.id, ctx.match[0] + dutyNumber, dutyRequired);
@@ -124,12 +131,27 @@ bot.hears(/^[89]\d{5}[A-Z]?/i, async ctx => {
   );
 
   await axios.get(process.env.DUTYFILE).then(response => {
-    const dutyRequired =
+    let dutyRequired =
       response.data.duty[whichSpecialDuty][ctx.match[0].toUpperCase()];
     ctx.deleteMessage();
     sendDuty(ctx.chat.id, ctx.match[0], dutyRequired);
   });
 });
+
+// bot.command('setduty', ctx => {
+//   bot.telegram.sendMessage(
+//     ctx.chat.id,
+//     moment().day('Monday').isoWeek('1').toDate()
+//   );
+
+//   bot.on('message', async ctx => {
+//     await ctx.message.text.split('\n').forEach(x => {
+//       x.match(/^([a-z]\d{2})?([135][0-5][0-9])$/i)
+//         ? bot.telegram.sendMessage(ctx.chat.id, `${x} Duty`)
+//         : bot.telegram.sendMessage(ctx.chat.id, `${x} Not a duty`);
+//     });
+//   });
+// });
 
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
