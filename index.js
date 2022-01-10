@@ -6,8 +6,8 @@ const info = require('./src/info.json');
 
 const API_TOKEN =
   process.env.NODE_ENV === 'production'
-    ? process.env.BOT_TOKEN //production token
-    : process.env.TEST_BOT_TOKEN; //local dev token
+    ? process.env.BOT_TOKEN //production token - @veilicsDutyBot
+    : process.env.TEST_BOT_TOKEN; //local  token - @VeicryptoBot
 
 const bot = new Telegraf(API_TOKEN);
 
